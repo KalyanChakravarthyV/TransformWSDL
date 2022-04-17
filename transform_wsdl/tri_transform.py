@@ -1,10 +1,12 @@
 import sys
 from lxml import etree
 
-def parsexml(xmlfile ):
+TNS_ARRAY_OF_LENGTH = len("tns:ArrayOf")
 
+
+def parsexml(xmlfile):
     # get root element
-    root = etree.parse(xmlfile)#fromstring(bytes(xml, 'utf-8'))
+    root = etree.parse(xmlfile)  # fromstring(bytes(xml, 'utf-8'))
 
     # create empty list for news items
     arrayOfTypes = []
@@ -23,29 +25,24 @@ def parsexml(xmlfile ):
             arrayOfTypes.append(item.attrib['name'])
             subTypeNameElement = item.find('xsd:sequence/xsd:element', ns)
             subTypeName = subTypeNameElement.attrib['type']
-            subTypeName = subTypeName[subTypeName.find(':')+1:]
+            subTypeName = subTypeName[subTypeName.find(':') + 1:]
 
-            print(item.attrib['name']+":"+subTypeName )
+            print(item.attrib['name'] + ":" + subTypeName)
             arrayOfTypeElements[item.attrib['name']] = subTypeName
-            # item.getparent().remove(item)
+            item.getparent().remove(item)
 
-
-    # for arrayType in arrayOfTypes:
-    SUBSTRING_LEN = len("tns:ArrayOf")
-
-    for item in root.findall('.//xsd:element',ns):
+    for item in root.findall('.//xsd:element', ns):
         if item.attrib['type'].find("ArrayOf") > 0:
             prefix = item.attrib['type'][0:4]
-            print('Processing:'+ item.attrib['type'])
-            idx = item.attrib['type'][SUBSTRING_LEN:].find("Long")
+            print('Processing:' + item.attrib['type'])
+            array_of_native = item.attrib['type'][TNS_ARRAY_OF_LENGTH:]
 
-            if item.attrib['type'][SUBSTRING_LEN:].find('Long') > -1:
+            if array_of_native.endswith('Long'):
                 item.attrib['type'] = 'xsd:' + 'long'
-            elif item.attrib['type'][SUBSTRING_LEN:].find('String') > -1:
+            elif array_of_native.endswith('String'):
                 item.attrib['type'] = 'xsd:' + 'string'
             else:
                 item.attrib['type'] = prefix + arrayOfTypeElements[item.attrib['type'][len(prefix):]]
-                # item.attrib['type'][SUBSTRING_LEN:]
 
             item.attrib['maxOccurs'] = 'unbounded'
 

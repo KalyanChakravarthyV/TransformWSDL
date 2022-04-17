@@ -1,7 +1,13 @@
-# Transform WSDL to  make it more efficient
+# Tool for a specific WSDL transformation 
 
-Specifically for tools like wsdl2java to avoid generating redundant boilerplate code
+To prevent `wsdl2java` generating redundant boilerplate code
 
-##To use this simply run 
+###To install run
+```bash
+pip install -e .
+```
 
-TODO: command_to_run .py
+###Once installed, you can run it via 
+```bash
+transform_wsdl -i <inputfile> -o <outputfile>
+```
